@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medical Referral Letter</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="box">
+    <h1>Medical Referral Letter</h1>
+    <p>Enter the patient name and referral details, then click Generate Letter.</p>
+
+    <label for="patientName">Patient name</label>
+    <input id="patientName" type="text" placeholder="Patient name">
+
+    <label for="message">Referral details</label>
+    <textarea id="message" placeholder="Enter clinical summary, reason for referral, and any key notes."></textarea>
+
+    <button id="generateBtn" type="button">Generate Letter</button>
+
+    <h2>Generated Referral</h2>
+    <pre id="output"></pre>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
