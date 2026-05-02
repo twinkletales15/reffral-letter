@@ -1,26 +1,438 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Medical Referral Letter</title>
+  <title>Clinical Referral Builder - Professional</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.5/dist/signature_pad.umd.min.js"></script>
 </head>
 <body>
-  <div class="box">
-    <h1>Medical Referral Letter</h1>
-    <p>Enter the patient name and referral details, then click Generate Letter.</p>
+  <div class="shell" id="appShell">
+    <header class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">Referral workbench</span>
+        <h1>Clinical Referral Letter Builder</h1>
+        <p>Professional referral generation with voice dictation and templates.</p>
+      </div>
+      <div class="hero-controls">
+        <select id="languageSelect" class="language-selector">
+          <option value="en">English</option>
+          <option value="es">Español</option>
+          <option value="fr">Français</option>
+        </select>
+        <button id="darkModeBtn" class="btn btn-icon" title="Toggle dark mode">🌙</button>
+        <button id="doctorProfileBtn" class="btn btn-secondary btn-small">👤 Doctor</button>
+        <span id="autoSaveIndicator" class="auto-save-indicator">●</span>
+      </div>
+    </header>
 
-    <label for="patientName">Patient name</label>
-    <input id="patientName" type="text" placeholder="Patient name">
+    <div class="layout-main">
+      <main class="layout">
+        <section class="panel panel-left">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Patient & Referral Info</p>
+              <h2>Complete Referral Details</h2>
+            </div>
+          </div>
 
-    <label for="message">Referral details</label>
-    <textarea id="message" placeholder="Enter clinical summary, reason for referral, and any key notes."></textarea>
+          <!-- PATIENT INFO -->
+          <div class="section-title">Patient Information</div>
+          <div class="field-grid">
+            <label class="field-label">
+              Patient Name <span class="required">*</span>
+              <input id="patientName" type="text" placeholder="Full patient name" />
+            </label>
 
-    <button id="generateBtn" type="button">Generate Letter</button>
+            <label class="field-label">
+              Phone <span class="hint">📱</span>
+              <input id="patientPhone" type="tel" placeholder="+1 (555) 000-0000" />
+            </label>
 
-    <h2>Generated Referral</h2>
-    <pre id="output"></pre>
+            <label class="field-label">
+              Age
+              <input id="patientAge" type="number" placeholder="34" />
+            </label>
+
+            <label class="field-label">
+              Email <span class="hint">✉️</span>
+              <input id="patientEmail" type="email" placeholder="patient@example.com" />
+            </label>
+
+            <label class="field-label">
+              Sex
+              <select id="patientSex">
+                <option value="">Select sex</option>
+                <option>Male</option>
+                <option>Female</option>
+                <option>Other</option>
+              </select>
+            </label>
+          </div>
+
+          <!-- RECEIVING DOCTOR -->
+          <div class="section-title">Receiving Doctor Details</div>
+          <div class="field-grid">
+            <label class="field-label">
+              Doctor Name <span class="hint">👨‍⚕️</span>
+              <input id="receivingDocName" type="text" placeholder="Dr. Jane Smith" />
+            </label>
+
+            <label class="field-label">
+              Specialty
+              <select id="specialty">
+                <option value="">Choose specialty</option>
+                <option>Cardiology</option>
+                <option>Neurology</option>
+                <option>Orthopaedics</option>
+                <option>Gastroenterology</option>
+                <option>General Surgery</option>
+                <option>Nephrology</option>
+                <option>Pulmonology</option>
+                <option>ENT</option>
+                <option>Oncology</option>
+              </select>
+            </label>
+
+            <label class="field-label">
+              Hospital/Clinic
+              <input id="hospital" type="text" placeholder="City Hospital" />
+            </label>
+
+            <label class="field-label">
+              Urgency
+              <select id="urgency">
+                <option value="Routine">Routine</option>
+                <option>Urgent</option>
+                <option>Emergency</option>
+              </select>
+            </label>
+
+            <label class="field-label">
+              Status <span class="badge-small">Track</span>
+              <select id="referralStatus">
+                <option value="Draft">Draft</option>
+                <option value="Sent">Sent</option>
+                <option value="Pending">Pending</option>
+                <option value="Accepted">Accepted</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </label>
+          </div>
+
+          <!-- MEDICAL INFO -->
+          <div class="section-title">Medical Information</div>
+          <label class="textarea-label">
+            Medical History <span class="hint">🏥</span>
+            <textarea id="medicalHistory" placeholder="Relevant past medical conditions, previous surgeries..."></textarea>
+          </label>
+
+          <div class="field-group">
+            <label class="field-label">
+              History Template
+              <select id="historyTemplate">
+                <option value="">Choose template...</option>
+                <option value="diabetes">Diabetes Management</option>
+                <option value="hypertension">Hypertension</option>
+                <option value="cardiac">Cardiac Conditions</option>
+                <option value="respiratory">Respiratory Issues</option>
+                <option value="orthopedic">Orthopedic Problems</option>
+                <option value="neurological">Neurological Symptoms</option>
+                <option value="gastrointestinal">GI Disorders</option>
+                <option value="dermatological">Skin Conditions</option>
+                <option value="mental_health">Mental Health</option>
+                <option value="cancer">Oncology</option>
+              </select>
+            </label>
+          </div>
+
+          <label class="textarea-label">
+            Medications & Allergies <span class="hint">💊</span>
+            <textarea id="medications" placeholder="Current medications and known allergies (critical for safety)..."></textarea>
+          </label>
+
+          <label class="textarea-label">
+            Investigations & Findings <span class="hint">🔬</span>
+            <textarea id="investigations" placeholder="Recent lab results, imaging, test findings..."></textarea>
+          </label>
+
+          <label class="textarea-label">
+            Diagnosis & Assessment <span class="hint">📋</span>
+            <textarea id="diagnosis" placeholder="Current diagnosis and clinical assessment..."></textarea>
+          </label>
+
+          <label class="textarea-label">
+            Referral Reason <span class="required">*</span>
+            <textarea id="message" placeholder="Reason for referral and specific requests..."></textarea>
+          </label>
+
+          <!-- FOLLOW-UP SCHEDULING -->
+          <div class="section-title">Follow-up & Scheduling</div>
+          <div class="field-grid">
+            <label class="field-label">
+              Follow-up Date
+              <input id="followUpDate" type="date" />
+            </label>
+
+            <label class="field-label">
+              Follow-up Reason
+              <input id="followUpReason" type="text" placeholder="Reason for follow-up" />
+            </label>
+
+            <label class="field-label">
+              Appointment Type
+              <select id="appointmentType">
+                <option value="">Select type</option>
+                <option value="consultation">Consultation</option>
+                <option value="procedure">Procedure</option>
+                <option value="followup">Follow-up</option>
+                <option value="urgent">Urgent Care</option>
+                <option value="emergency">Emergency</option>
+              </select>
+            </label>
+          </div>
+
+          <!-- ATTACHMENTS -->
+          <div class="section-title">Attachments <span class="hint">📎</span></div>
+          <label class="file-upload-label">
+            <input id="fileAttachment" type="file" multiple />
+            <span class="upload-text">Click to attach files (lab results, images, reports)</span>
+          </label>
+          <div id="attachmentList" class="attachment-list"></div>
+
+          <!-- CLINICAL GUIDELINES -->
+          <div class="section-title">Clinical Guidelines</div>
+          <div class="field-group">
+            <label class="field-label">
+              Reference Guidelines
+              <select id="clinicalGuidelines">
+                <option value="">Select guideline...</option>
+                <option value="diabetes">ADA Diabetes Guidelines</option>
+                <option value="hypertension">JNC-8 Hypertension</option>
+                <option value="cardiac">ACC/AHA Cardiac Care</option>
+                <option value="cancer">NCCN Cancer Guidelines</option>
+                <option value="asthma">GINA Asthma Guidelines</option>
+                <option value="copd">GOLD COPD Guidelines</option>
+                <option value="stroke">AHA Stroke Guidelines</option>
+                <option value="depression">APA Depression Guidelines</option>
+              </select>
+            </label>
+            <button id="viewGuidelineBtn" class="btn btn-small">View Guideline</button>
+          </div>
+
+          <!-- ACTION BUTTONS -->
+          <div class="button-row">
+            <button id="generateBtn" class="btn btn-primary">Generate Letter</button>
+            <button id="saveDraftBtn" class="btn btn-secondary">Save Draft</button>
+            <button id="loadDraftBtn" class="btn btn-secondary">Load Draft</button>
+            <button id="undoBtn" class="btn btn-secondary" disabled>↶ Undo</button>
+            <button id="redoBtn" class="btn btn-secondary" disabled>↷ Redo</button>
+          </div>
+        </section>
+
+        <!-- LETTER PREVIEW -->
+        <aside class="panel panel-right">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Preview</p>
+              <h2>Letter Output</h2>
+            </div>
+            <button id="copyLetterBtn" class="btn btn-small" disabled title="Copy to clipboard">📋 Copy</button>
+          </div>
+          <pre id="output" class="letter-output">Your generated referral will appear here.</pre>
+          <div class="output-actions">
+            <button id="editLetterBtn" class="btn btn-secondary" disabled>✏️ Edit</button>
+            <button id="signLetterBtn" class="btn btn-secondary" disabled>✍️ Sign</button>
+            <button id="exportPdfBtn" class="btn btn-secondary" disabled>📄 PDF</button>
+            <button id="printBtn" class="btn btn-secondary" disabled>🖨️ Print</button>
+            <button id="saveHistoryBtn" class="btn btn-secondary" disabled>💾 Save</button>
+          </div>
+        </aside>
+      </main>
+
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="sidebar-section">
+          <h3>📋 Templates</h3>
+          <button id="saveTemplateBtn" class="btn btn-small">New Template</button>
+          <select id="templateSelect">
+            <option value="">Load template...</option>
+          </select>
+          <button id="deleteTemplateBtn" class="btn btn-small btn-danger" disabled>Delete</button>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>📚 History</h3>
+          <input id="historySearch" type="text" placeholder="Search patient..." class="search-input" />
+          <div id="historyList" class="history-list"></div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>📄 Consent Forms</h3>
+          <select id="consentFormSelect">
+            <option value="">Select form...</option>
+            <option value="procedure">Procedure Consent</option>
+            <option value="treatment">Treatment Consent</option>
+            <option value="anesthesia">Anesthesia Consent</option>
+            <option value="blood_transfusion">Blood Transfusion</option>
+            <option value="imaging">Imaging Consent</option>
+            <option value="research">Research Participation</option>
+          </select>
+          <button id="generateConsentBtn" class="btn btn-small">Generate Form</button>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>📅 Appointments</h3>
+          <button id="scheduleAppointmentBtn" class="btn btn-small">Schedule</button>
+          <div id="appointmentList" class="appointment-list"></div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>🌐 Medical Terms</h3>
+          <select id="medicalTermLanguage">
+            <option value="en">English</option>
+            <option value="es">Español</option>
+            <option value="fr">Français</option>
+            <option value="ar">العربية</option>
+            <option value="zh">中文</option>
+          </select>
+          <input id="medicalTermSearch" type="text" placeholder="Search term..." class="search-input" />
+          <div id="medicalTermResult" class="medical-term-result"></div>
+        </div>
+
+      </aside>
+    </div>
+
+    <!-- VOICE RECORDING -->
+    <section class="panel recorder-panel">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Voice Dictation</p>
+          <h2>Record Clinical Notes</h2>
+        </div>
+        <span class="badge">Optional</span>
+      </div>
+      <div class="recorder">
+        <div class="recorder-controls">
+          <button id="recordBtn" class="btn btn-primary">🎤 Record</button>
+          <button id="stopRecordBtn" class="btn btn-warning" disabled>⏹ Stop</button>
+          <button id="playbackBtn" class="btn btn-info" disabled>▶️ Play</button>
+          <button id="dictateBtn" class="btn btn-success">🗣️ Dictate</button>
+          <button id="deleteRecordingBtn" class="btn btn-danger" disabled>🗑️ Delete</button>
+        </div>
+        <p id="recordingStatus" class="status-text">Microphone ready</p>
+        <audio id="audioPlayback" controls hidden></audio>
+      </div>
+    </section>
+  </div>
+
+  <!-- EDIT LETTER MODAL -->
+  <div id="editModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Edit Letter</h2>
+        <button class="modal-close" id="closeEditModal">&times;</button>
+      </div>
+      <textarea id="editLetterText" class="modal-textarea"></textarea>
+      <div class="modal-actions">
+        <button id="saveEditBtn" class="btn btn-primary">Save Changes</button>
+        <button id="cancelEditBtn" class="btn btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIGNATURE MODAL -->
+  <div id="signatureModal" class="modal hidden">
+    <div class="modal-content signature-modal">
+      <div class="modal-header">
+        <h2>Digital Signature</h2>
+        <button class="modal-close" id="closeSignatureModal">&times;</button>
+      </div>
+      <p>Please sign below:</p>
+      <canvas id="signaturePad" width="600" height="200" style="border: 1px solid #ccc; border-radius: 12px;"></canvas>
+      <div class="modal-actions">
+        <button id="clearSignatureBtn" class="btn btn-secondary">Clear</button>
+        <button id="saveSignatureBtn" class="btn btn-primary">Save Signature</button>
+        <button id="cancelSignatureBtn" class="btn btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOCTOR PROFILE MODAL -->
+  <div id="profileModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Doctor Profile</h2>
+        <button class="modal-close" id="closeProfileModal">&times;</button>
+      </div>
+      <div class="profile-form">
+        <label class="field-label">
+          Doctor Name
+          <input id="doctorName" type="text" placeholder="Your full name" />
+        </label>
+        <label class="field-label">
+          Medical License #
+          <input id="doctorLicense" type="text" placeholder="License number" />
+        </label>
+        <label class="field-label">
+          Clinic/Hospital
+          <input id="doctorHospital" type="text" placeholder="Your clinic/hospital" />
+        </label>
+        <label class="field-label">
+          Signature (upload image)
+          <input id="doctorSignature" type="file" accept="image/*" />
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button id="saveProfileBtn" class="btn btn-primary">Save Profile</button>
+        <button id="cancelProfileBtn" class="btn btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONSENT FORM MODAL -->
+  <div id="consentModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="consentTitle">Consent Form</h2>
+        <button class="modal-close" id="closeConsentModal">&times;</button>
+      </div>
+      <div id="consentContent" class="consent-content"></div>
+      <div class="modal-actions">
+        <button id="printConsentBtn" class="btn btn-primary">Print Form</button>
+        <button id="closeConsentBtn" class="btn btn-secondary">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPOINTMENT MODAL -->
+  <div id="appointmentModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Schedule Appointment</h2>
+        <button class="modal-close" id="closeAppointmentModal">&times;</button>
+      </div>
+      <div class="appointment-form">
+        <label class="field-label">
+          Appointment Date
+          <input id="appointmentDate" type="datetime-local" />
+        </label>
+        <label class="field-label">
+          Duration (minutes)
+          <input id="appointmentDuration" type="number" value="30" min="15" max="240" />
+        </label>
+        <label class="field-label">
+          Notes
+          <textarea id="appointmentNotes" placeholder="Appointment details..."></textarea>
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button id="saveAppointmentBtn" class="btn btn-primary">Schedule</button>
+        <button id="cancelAppointmentBtn" class="btn btn-secondary">Cancel</button>
+      </div>
+    </div>
   </div>
 
   <script src="app.js"></script>
