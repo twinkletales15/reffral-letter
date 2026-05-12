@@ -19,12 +19,21 @@
       <div class="hero-controls">
         <select id="languageSelect" class="language-selector">
           <option value="en">English</option>
-          <option value="es">Español</option>
-          <option value="fr">Français</option>
+          <option value="hi">हिन्दी</option>
+          <option value="ta">தமிழ்</option>
+          <option value="te">తెలుగు</option>
+          <option value="ml">മലയാളം</option>
+          <option value="kn">ಕನ್ನಡ</option>
+          <option value="bn">বাংলা</option>
+          <option value="mr">मराठी</option>
+          <option value="gu">ગુજરાતી</option>
+          <option value="pa">ਪੰਜਾਬੀ</option>
         </select>
-        <button id="darkModeBtn" class="btn btn-icon" title="Toggle dark mode">🌙</button>
         <button id="doctorProfileBtn" class="btn btn-secondary btn-small">👤 Doctor</button>
-        <span id="autoSaveIndicator" class="auto-save-indicator">●</span>
+        <span class="auto-save-status">
+          <span id="autoSaveIndicator" class="auto-save-indicator">●</span>
+          <span id="autoSaveStatusText">Ready</span>
+        </span>
       </div>
     </header>
 
@@ -47,13 +56,23 @@
             </label>
 
             <label class="field-label">
+              Patient ID / MR No.
+              <input id="patientId" type="text" placeholder="MRN-0001" />
+            </label>
+
+            <label class="field-label">
               Phone <span class="hint">📱</span>
               <input id="patientPhone" type="tel" placeholder="+1 (555) 000-0000" />
             </label>
 
             <label class="field-label">
               Age
-              <input id="patientAge" type="number" placeholder="34" />
+              <input id="patientAge" type="number" placeholder="Auto from DOB" />
+            </label>
+
+            <label class="field-label">
+              Date of Birth
+              <input id="patientDob" type="date" />
             </label>
 
             <label class="field-label">
@@ -69,6 +88,16 @@
                 <option>Female</option>
                 <option>Other</option>
               </select>
+            </label>
+
+            <label class="field-label">
+              Date of Referral
+              <input id="patientDetailDate" type="date" />
+            </label>
+
+            <label class="field-label">
+              Time
+              <input id="patientDetailTime" type="time" />
             </label>
           </div>
 
@@ -94,11 +123,22 @@
                 <option>ENT</option>
                 <option>Oncology</option>
               </select>
+              <span id="specialtySuggestion" class="field-note">Auto specialty suggestion will appear after entering clinical details.</span>
             </label>
 
             <label class="field-label">
               Hospital/Clinic
               <input id="hospital" type="text" placeholder="City Hospital" />
+            </label>
+
+            <label class="field-label">
+              Doctor Phone
+              <input id="receivingDocPhone" type="tel" placeholder="+91 00000 00000" />
+            </label>
+
+            <label class="field-label">
+              Doctor Email
+              <input id="receivingDocEmail" type="email" placeholder="doctor@hospital.com" />
             </label>
 
             <label class="field-label">
@@ -110,63 +150,109 @@
               </select>
             </label>
 
-            <label class="field-label">
-              Status <span class="badge-small">Track</span>
-              <select id="referralStatus">
-                <option value="Draft">Draft</option>
-                <option value="Sent">Sent</option>
-                <option value="Pending">Pending</option>
-                <option value="Accepted">Accepted</option>
-                <option value="Completed">Completed</option>
-              </select>
-            </label>
+            <input id="referralStatus" type="hidden" value="Draft" />
           </div>
 
-          <!-- MEDICAL INFO -->
-          <div class="section-title">Medical Information</div>
-          <label class="textarea-label">
-            Medical History <span class="hint">🏥</span>
-            <textarea id="medicalHistory" placeholder="Relevant past medical conditions, previous surgeries..."></textarea>
-          </label>
+          <!-- CLINICAL DETAILS -->
+          <div class="clinical-section-head">
+            <div>
+              <div class="section-title">Clinical Details</div>
+              <p class="clinical-section-note">Add the key findings here. Gemini voice and specialty suggestion use these fields.</p>
+            </div>
+          </div>
+          <div class="clinical-grid">
+            <div class="textarea-label clinical-field">
+              <div class="clinical-field-title">
+                <label for="medicalHistory"><span class="clinical-icon">01</span> Current Symptoms</label>
+                <button class="clinical-mic-btn" type="button" data-dictate-target="medicalHistory">🎙️ Speak</button>
+              </div>
+              <span class="clinical-helper">Main complaints, duration, severity, and relevant negatives.</span>
+              <textarea id="medicalHistory" placeholder="Example: Chest pain for 2 days, worse on exertion, associated with breathlessness..."></textarea>
+            </div>
 
-          <div class="field-group">
-            <label class="field-label">
-              History Template
-              <select id="historyTemplate">
-                <option value="">Choose template...</option>
-                <option value="diabetes">Diabetes Management</option>
-                <option value="hypertension">Hypertension</option>
-                <option value="cardiac">Cardiac Conditions</option>
-                <option value="respiratory">Respiratory Issues</option>
-                <option value="orthopedic">Orthopedic Problems</option>
-                <option value="neurological">Neurological Symptoms</option>
-                <option value="gastrointestinal">GI Disorders</option>
-                <option value="dermatological">Skin Conditions</option>
-                <option value="mental_health">Mental Health</option>
-                <option value="cancer">Oncology</option>
-              </select>
-            </label>
+            <div class="textarea-label clinical-field">
+              <div class="clinical-field-title">
+                <label for="physicalExam"><span class="clinical-icon">02</span> Physical Examination</label>
+                <button class="clinical-mic-btn" type="button" data-dictate-target="physicalExam">🎙️ Speak</button>
+              </div>
+              <span class="clinical-helper">Vitals, systemic findings, local examination, and red flags.</span>
+              <textarea id="physicalExam" placeholder="Example: BP 150/90, pulse 96/min, chest clear, no pedal edema..."></textarea>
+            </div>
+
+            <div class="textarea-label clinical-field">
+              <div class="clinical-field-title">
+                <label for="investigations"><span class="clinical-icon">03</span> Result</label>
+                <button class="clinical-mic-btn" type="button" data-dictate-target="investigations">🎙️ Speak</button>
+              </div>
+              <span class="clinical-helper">Lab reports, imaging, ECG, scan findings, or attached results.</span>
+              <textarea id="investigations" placeholder="Example: ECG shows ST-T changes, Hb 12.5, creatinine 0.9..."></textarea>
+            </div>
+
+            <div class="textarea-label clinical-field">
+              <div class="clinical-field-title">
+                <label for="diagnosis"><span class="clinical-icon">04</span> Report / Impression</label>
+                <button class="clinical-mic-btn" type="button" data-dictate-target="diagnosis">🎙️ Speak</button>
+              </div>
+              <span class="clinical-helper">Clinical impression, provisional diagnosis, or report notes.</span>
+              <textarea id="diagnosis" placeholder="Example: Suspected angina, needs cardiology evaluation..."></textarea>
+            </div>
+
+            <div class="textarea-label clinical-field clinical-field-wide">
+              <div class="clinical-field-title">
+                <label for="message"><span class="clinical-icon">05</span> Referral Reason <span class="required">*</span></label>
+                <button class="clinical-mic-btn" type="button" data-dictate-target="message">🎙️ Speak</button>
+              </div>
+              <span class="clinical-helper">What you want the receiving doctor to assess, advise, or manage.</span>
+              <textarea id="message" placeholder="Example: Kindly evaluate for further cardiac workup and management advice..."></textarea>
+            </div>
           </div>
 
-          <label class="textarea-label">
-            Medications & Allergies <span class="hint">💊</span>
-            <textarea id="medications" placeholder="Current medications and known allergies (critical for safety)..."></textarea>
-          </label>
+          <div class="section-title">Medicines & Allergies</div>
+          <div class="clinical-grid">
+            <div class="textarea-label clinical-field">
+              <div class="clinical-field-title">
+                <label for="medications"><span class="clinical-icon">Rx</span> Current Medicines</label>
+                <button class="clinical-mic-btn" type="button" data-dictate-target="medications">🎙️ Speak</button>
+              </div>
+              <span class="clinical-helper">Current medicines, dose, frequency, and recent treatment.</span>
+              <textarea id="medications" placeholder="Example: Aspirin 75 mg OD, atorvastatin 20 mg HS, metformin 500 mg BD..."></textarea>
+            </div>
 
-          <label class="textarea-label">
-            Investigations & Findings <span class="hint">🔬</span>
-            <textarea id="investigations" placeholder="Recent lab results, imaging, test findings..."></textarea>
-          </label>
+            <div class="textarea-label clinical-field">
+              <div class="clinical-field-title">
+                <label for="allergies"><span class="clinical-icon">!</span> Allergies</label>
+                <button class="clinical-mic-btn" type="button" data-dictate-target="allergies">🎙️ Speak</button>
+              </div>
+              <span class="clinical-helper">Drug, food, or other allergies and reaction type.</span>
+              <textarea id="allergies" placeholder="Example: Penicillin allergy - rash. No known food allergy..."></textarea>
+            </div>
+          </div>
 
-          <label class="textarea-label">
-            Diagnosis & Assessment <span class="hint">📋</span>
-            <textarea id="diagnosis" placeholder="Current diagnosis and clinical assessment..."></textarea>
-          </label>
-
-          <label class="textarea-label">
-            Referral Reason <span class="required">*</span>
-            <textarea id="message" placeholder="Reason for referral and specific requests..."></textarea>
-          </label>
+          <!-- VOICE RECORDING -->
+          <div class="voice-card">
+            <div class="voice-card-header">
+              <div>
+                <p class="eyebrow">Voice Dictation</p>
+                <h3>Record Clinical Notes</h3>
+              </div>
+              <span class="badge-small">Optional</span>
+            </div>
+            <div class="recorder">
+              <div class="recorder-controls">
+                <button id="recordBtn" class="btn btn-primary">🎤 Record</button>
+                <button id="stopRecordBtn" class="btn btn-warning" disabled>⏹ Stop</button>
+                <button id="playbackBtn" class="btn btn-info" disabled>▶️ Play</button>
+                <button id="dictateBtn" class="btn btn-success">🗣️ Dictate</button>
+                <button id="deleteRecordingBtn" class="btn btn-danger" disabled>🗑️ Delete</button>
+              </div>
+              <label class="field-label">
+                Gemini API Key
+                <input id="llmApiKey" type="password" placeholder="Optional: paste Gemini API key for voice field fill" autocomplete="off" />
+              </label>
+              <p id="recordingStatus" class="status-text">Microphone ready</p>
+              <audio id="audioPlayback" controls hidden></audio>
+            </div>
+          </div>
 
           <!-- FOLLOW-UP SCHEDULING -->
           <div class="section-title">Follow-up & Scheduling</div>
@@ -222,6 +308,16 @@
             <button id="viewGuidelineBtn" class="btn btn-small">View Guideline</button>
           </div>
 
+          <div class="section-title">Gemini Quick Fill</div>
+          <div class="quick-fill-card">
+            <label class="textarea-label">
+              One Sentence Fill
+              <textarea id="quickFillInput" placeholder="Example: Ravi, 45 year male, chest pain for 2 days, urgent cardiology referral, taking aspirin, no known allergy."></textarea>
+            </label>
+            <button id="quickFillBtn" class="btn btn-primary" type="button">✨ Fill Form with Gemini</button>
+            <p id="quickFillStatus" class="field-note">Enter one sentence, then Gemini will fill matching form fields.</p>
+          </div>
+
           <!-- ACTION BUTTONS -->
           <div class="button-row">
             <button id="generateBtn" class="btn btn-primary">Generate Letter</button>
@@ -244,16 +340,76 @@
           <pre id="output" class="letter-output">Your generated referral will appear here.</pre>
           <div class="output-actions">
             <button id="editLetterBtn" class="btn btn-secondary" disabled>✏️ Edit</button>
+            <button id="improveLetterBtn" class="btn btn-secondary" disabled>✨ Improve Letter</button>
+            <button id="translateLetterBtn" class="btn btn-secondary" disabled>🌐 Translate Letter</button>
             <button id="signLetterBtn" class="btn btn-secondary" disabled>✍️ Sign</button>
+            <button id="saveLetterBtn" class="btn btn-secondary" disabled>💾 Save Letter</button>
             <button id="exportPdfBtn" class="btn btn-secondary" disabled>📄 PDF</button>
+            <button id="exportWordBtn" class="btn btn-secondary" disabled>📝 Word</button>
+            <button id="copyEmailBtn" class="btn btn-secondary" disabled>✉️ Copy Email</button>
+            <button id="openEmailBtn" class="btn btn-secondary" disabled>📧 Open Email</button>
             <button id="printBtn" class="btn btn-secondary" disabled>🖨️ Print</button>
-            <button id="saveHistoryBtn" class="btn btn-secondary" disabled>💾 Save</button>
+            <button id="saveHistoryBtn" class="btn btn-secondary" disabled>🗂️ Save History</button>
           </div>
         </aside>
       </main>
 
       <!-- SIDEBAR -->
       <aside class="sidebar">
+        <div class="sidebar-section">
+          <h3>🔒 Privacy</h3>
+          <button id="privacyModeBtn" class="btn btn-small">Hide Patient Details</button>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>🏥 Specialists</h3>
+          <select id="specialistSelect">
+            <option value="">Load saved specialist...</option>
+          </select>
+          <button id="saveSpecialistBtn" class="btn btn-small">Save Current Doctor</button>
+          <button id="deleteSpecialistBtn" class="btn btn-small btn-danger" disabled>Delete Specialist</button>
+          <div id="specialistDirectoryList" class="specialist-list"></div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>⚡ Specialty Templates</h3>
+          <button class="btn btn-small specialty-template-btn" type="button" data-template="Cardiology">Cardiology</button>
+          <button class="btn btn-small specialty-template-btn" type="button" data-template="Neurology">Neurology</button>
+          <button class="btn btn-small specialty-template-btn" type="button" data-template="Orthopaedics">Orthopedic</button>
+          <button class="btn btn-small specialty-template-btn" type="button" data-template="General Surgery">Surgery</button>
+          <button class="btn btn-small specialty-template-btn" type="button" data-template="Emergency">Emergency</button>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>⏰ Follow-ups</h3>
+          <div id="followUpSummary" class="followup-summary"></div>
+          <div id="followUpReminderList" class="followup-list"></div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>🧭 Advanced Tracker</h3>
+          <input id="trackerSearch" type="text" placeholder="Search patient, hospital, specialty..." class="search-input" />
+          <select id="trackerStatusFilter">
+            <option value="">All statuses</option>
+            <option>Draft</option>
+            <option>Sent</option>
+            <option>Pending</option>
+            <option>Accepted</option>
+            <option>Completed</option>
+          </select>
+          <select id="trackerUrgencyFilter">
+            <option value="">All urgency levels</option>
+            <option>Routine</option>
+            <option>Urgent</option>
+            <option>Emergency</option>
+          </select>
+          <select id="trackerSpecialtyFilter">
+            <option value="">All specialties</option>
+          </select>
+          <div id="trackerSummary" class="tracker-summary"></div>
+          <div id="advancedTrackerList" class="advanced-tracker-list"></div>
+        </div>
+
         <div class="sidebar-section">
           <h3>📋 Templates</h3>
           <button id="saveTemplateBtn" class="btn btn-small">New Template</button>
@@ -293,10 +449,15 @@
           <h3>🌐 Medical Terms</h3>
           <select id="medicalTermLanguage">
             <option value="en">English</option>
-            <option value="es">Español</option>
-            <option value="fr">Français</option>
-            <option value="ar">العربية</option>
-            <option value="zh">中文</option>
+            <option value="hi">हिन्दी</option>
+            <option value="ta">தமிழ்</option>
+            <option value="te">తెలుగు</option>
+            <option value="ml">മലയാളം</option>
+            <option value="kn">ಕನ್ನಡ</option>
+            <option value="bn">বাংলা</option>
+            <option value="mr">मराठी</option>
+            <option value="gu">ગુજરાતી</option>
+            <option value="pa">ਪੰਜਾਬੀ</option>
           </select>
           <input id="medicalTermSearch" type="text" placeholder="Search term..." class="search-input" />
           <div id="medicalTermResult" class="medical-term-result"></div>
@@ -305,27 +466,6 @@
       </aside>
     </div>
 
-    <!-- VOICE RECORDING -->
-    <section class="panel recorder-panel">
-      <div class="panel-header">
-        <div>
-          <p class="eyebrow">Voice Dictation</p>
-          <h2>Record Clinical Notes</h2>
-        </div>
-        <span class="badge">Optional</span>
-      </div>
-      <div class="recorder">
-        <div class="recorder-controls">
-          <button id="recordBtn" class="btn btn-primary">🎤 Record</button>
-          <button id="stopRecordBtn" class="btn btn-warning" disabled>⏹ Stop</button>
-          <button id="playbackBtn" class="btn btn-info" disabled>▶️ Play</button>
-          <button id="dictateBtn" class="btn btn-success">🗣️ Dictate</button>
-          <button id="deleteRecordingBtn" class="btn btn-danger" disabled>🗑️ Delete</button>
-        </div>
-        <p id="recordingStatus" class="status-text">Microphone ready</p>
-        <audio id="audioPlayback" controls hidden></audio>
-      </div>
-    </section>
   </div>
 
   <!-- EDIT LETTER MODAL -->
